@@ -30,20 +30,22 @@ SET program_list = ['Brave New World', 'Intelligence', 'The Capture'];
 ***************************************************************************************************************/
 WITH early_adopter_total_viewing AS (
 SELECT
-view_stats.aid,
-view_stats.audiencecohort,
-view_stats.distinct_titles,
-view_stats.content_starts,
-view_stats.content_completed,
-view_time.total_hours
+aid,
+audiencecohort,
+distinct_titles,
+content_starts,
+content_completed,
+total_hours
 FROM (SELECT  
       aid,
       audiencecohort, 
-      count(DISTINCT Program) AS distinct_titles,
+      count(DISTINCT new_program) AS distinct_titles,
       sum(num_views_started) AS content_starts,
-      sum(num_views_completed) AS content_completed
+      sum(num_views_completed) AS content_completed,
+      sum(num_seconds_played_no_ads)/3600 as total_hours
+      
       FROM (
-              (SELECT * 
+              (SELECT * ,  case when lower(consumption_type) like '%shortform%' then 'shortform' else program end as new_program 
               FROM
              `res-nbcupea-dev-ds-sandbox-001.silverTables.SILVER_VIDEO`
                WHERE 
@@ -63,54 +65,30 @@ FROM (SELECT
              video.adobe_timestamp < datetime_add(datetime(campaign_start_period), INTERVAL analysis_window day) -- analyze 4/29 to 5/5
              ) 
             GROUP BY 
-            aid, audiencecohort)  AS view_stats
-INNER JOIN -- append total hours viewed
-(SELECT 
-      aid,
-      audiencecohort, 
-      sum(num_seconds_played_no_ads) / 3600 AS total_hours
-      FROM (
-          (SELECT * 
-          FROM
-          `res-nbcupea-dev-ds-sandbox-001.silverTables.SILVER_VIDEO`
-          )
-          AS video
-          INNER JOIN 
-             (
-             SELECT * FROM `nbcu-sdp-sandbox-prod.hr_sandbox.all_audiencecohort_table_signup_dates` 
-               WHERE 
-             adopter_group like '%early%' and signup_date >= '2020-06-21' --signup_date <  CAST('2020-04-29' AS DATE) 
-             ) AS usertable  
-          ON video.adobe_tracking_id = usertable.aid 
-          AND video.adobe_timestamp >= datetime(campaign_start_period)--4/29
-          AND video.adobe_timestamp < datetime_add(datetime(campaign_start_period), INTERVAL analysis_window day) -- analyze 4/29 to 5/5
-          )    
-      GROUP BY
-      aid, audiencecohort) AS view_time
-ON view_stats.aid = view_time.aid 
-AND view_stats.audiencecohort = view_time.audiencecohort
-),
-
+            aid, audiencecohort) ),
+            
 /*************************************************************************************************************
  Grab the PROMOTED program video viewing data of early adopters in each audience cohorts from campaign start day to +7 days after they signed up.
  :: just promoted programs
 ***************************************************************************************************************/
 early_adopter_promoted_viewing AS (
 SELECT
-view_stats.aid,
-view_stats.audiencecohort,
-view_stats.distinct_titles,
-view_stats.content_starts,
-view_stats.content_completed,
-view_time.total_hours
+aid,
+audiencecohort,
+distinct_titles,
+content_starts,
+content_completed,
+total_hours
 FROM (SELECT  
       aid,
       audiencecohort, 
-      count(DISTINCT Program) AS distinct_titles,
+      count(DISTINCT new_program) AS distinct_titles,
       sum(num_views_started) AS content_starts,
-      sum(num_views_completed) AS content_completed
+      sum(num_views_completed) AS content_completed,
+      sum(num_seconds_played_no_ads)/3600 as total_hours
+      
       FROM (
-              (SELECT * 
+              (SELECT * , case when lower(consumption_type) like '%shortform%' then 'shortform' else program end as new_program 
               FROM
              `res-nbcupea-dev-ds-sandbox-001.silverTables.SILVER_VIDEO`
                WHERE 
@@ -132,37 +110,7 @@ FROM (SELECT
              video.adobe_timestamp < datetime_add(datetime(campaign_start_period), INTERVAL analysis_window day) -- analyze 4/29 to 5/5
              ) 
             GROUP BY 
-            aid, audiencecohort)  AS view_stats
-INNER JOIN -- append total hours viewed
-(SELECT 
-      aid,
-      audiencecohort, 
-      sum(num_seconds_played_no_ads) / 3600 AS total_hours
-      FROM (
-          (SELECT * 
-          FROM
-          `res-nbcupea-dev-ds-sandbox-001.silverTables.SILVER_VIDEO`
-               WHERE
-              program in UNNEST(program_list)
-          )
-          AS video
-          INNER JOIN 
-             (
-             SELECT * FROM `nbcu-sdp-sandbox-prod.hr_sandbox.all_audiencecohort_table_signup_dates` 
-               WHERE 
-             adopter_group like '%early%' and signup_date >= '2020-06-21'  --signup_date <  CAST('2020-04-29' AS DATE) 
-             ) AS usertable  
-          ON video.adobe_tracking_id = usertable.aid 
-          AND video.adobe_timestamp >= datetime(campaign_start_period)--4/29
-          AND video.adobe_timestamp < datetime_add(datetime(campaign_start_period), INTERVAL analysis_window day) -- analyze 4/29 to 5/5
-          )    
-      GROUP BY
-      aid, audiencecohort) AS view_time
-ON view_stats.aid = view_time.aid 
-AND view_stats.audiencecohort = view_time.audiencecohort
-),
-
-
+            aid, audiencecohort) ) ,
 
 /*************************************************************************************************************
  Grab the total video viewing data of late adopters 
@@ -171,20 +119,22 @@ AND view_stats.audiencecohort = view_time.audiencecohort
 ***************************************************************************************************************/
 late_adopter_total_viewing_after_second_session AS ( -- do not include peacock activity on the day of their signup 
 SELECT
-view_stats.aid,
-view_stats.audiencecohort,
-view_stats.distinct_titles,
-view_stats.content_starts,
-view_stats.content_completed,
-view_time.total_hours
+aid,
+audiencecohort,
+distinct_titles,
+content_starts,
+content_completed,
+total_hours
 FROM (SELECT  
       aid,
       audiencecohort, 
-      count(DISTINCT Program) AS distinct_titles,
+      count(DISTINCT new_program) AS distinct_titles,
       sum(num_views_started) AS content_starts,
-      sum(num_views_completed) AS content_completed
+      sum(num_views_completed) AS content_completed,
+      sum(num_seconds_played_no_ads)/3600 as total_hours
+      
       FROM (
-              (SELECT * 
+              (SELECT * , case when lower(consumption_type) like '%shortform%' then 'shortform' else program end as new_program 
               FROM
              `res-nbcupea-dev-ds-sandbox-001.silverTables.SILVER_VIDEO`
               WHERE 
@@ -204,35 +154,7 @@ FROM (SELECT
              date(video.adobe_timestamp) <= date(datetime_add(datetime(usertable.signup_date), INTERVAL analysis_window day)) 
              ) 
             GROUP BY 
-            aid, audiencecohort)  AS view_stats
-INNER JOIN -- attach the total hours viewed
-(SELECT 
-      aid,
-      audiencecohort, 
-      sum(num_seconds_played_no_ads) / 3600 AS total_hours
-      FROM (
-          (SELECT * 
-          FROM
-          `res-nbcupea-dev-ds-sandbox-001.silverTables.SILVER_VIDEO`
-          )
-          AS video
-          INNER JOIN 
-             (
-             SELECT * FROM `nbcu-sdp-sandbox-prod.hr_sandbox.all_audiencecohort_table_signup_dates` 
-              WHERE 
-             adopter_group like '%late%' and signup_date >= '2020-06-21'  -- signup_date >=  CAST('2020-04-29' AS DATE) 
-             ) AS usertable 
-          ON video.adobe_tracking_id = usertable.aid 
-          AND 
-          date(video.adobe_timestamp) > usertable.signup_date -- day after signup + 7
-          AND 
-          date(video.adobe_timestamp) <= date(datetime_add(datetime(usertable.signup_date), INTERVAL analysis_window day))  
-          )    
-      GROUP BY
-      aid, audiencecohort) AS view_time
-ON view_stats.aid = view_time.aid 
-AND view_stats.audiencecohort = view_time.audiencecohort
-),
+            aid, audiencecohort) ),
 
 /*************************************************************************************************************
  Grab the promoted program video viewing data of late adopters v2
@@ -241,20 +163,22 @@ AND view_stats.audiencecohort = view_time.audiencecohort
 ***************************************************************************************************************/
 late_adopter_promoted_program_viewing_after_second_session AS ( -- do not include peacock activity on the day of their signup 
 SELECT
-view_stats.aid,
-view_stats.audiencecohort,
-view_stats.distinct_titles,
-view_stats.content_starts,
-view_stats.content_completed,
-view_time.total_hours
+aid,
+audiencecohort,
+distinct_titles,
+content_starts,
+content_completed,
+total_hours
 FROM (SELECT  
       aid,
       audiencecohort, 
-      count(DISTINCT Program) AS distinct_titles,
+      count(DISTINCT new_program) AS distinct_titles,
       sum(num_views_started) AS content_starts,
-      sum(num_views_completed) AS content_completed
+      sum(num_views_completed) AS content_completed,
+      sum(num_seconds_played_no_ads)/3600 as total_hours
+      
       FROM (
-              (SELECT * 
+              (SELECT * , case when lower(consumption_type) like '%shortform%' then 'shortform' else program end as new_program 
               FROM
              `res-nbcupea-dev-ds-sandbox-001.silverTables.SILVER_VIDEO`
               WHERE 
@@ -275,34 +199,7 @@ FROM (SELECT
              date(video.adobe_timestamp) <= date(datetime_add(datetime(usertable.signup_date), INTERVAL analysis_window day)) 
              ) 
             GROUP BY 
-            aid, audiencecohort)  AS view_stats
-INNER JOIN -- attach the total hours viewed
-(SELECT 
-      aid,
-      audiencecohort, 
-      sum(num_seconds_played_no_ads) / 3600 AS total_hours
-      FROM (
-          (SELECT * 
-          FROM
-          `res-nbcupea-dev-ds-sandbox-001.silverTables.SILVER_VIDEO`
-          )
-          AS video
-          INNER JOIN 
-             (
-             SELECT * FROM `nbcu-sdp-sandbox-prod.hr_sandbox.all_audiencecohort_table_signup_dates` 
-              WHERE 
-             adopter_group like '%late%' and signup_date >= '2020-06-21'  -- signup_date >=  CAST('2020-04-29' AS DATE) 
-             ) AS usertable 
-          ON video.adobe_tracking_id = usertable.aid 
-          AND 
-          date(video.adobe_timestamp) > usertable.signup_date -- day after signup + 7
-          AND 
-          date(video.adobe_timestamp) <= date(datetime_add(datetime(usertable.signup_date), INTERVAL analysis_window day))  
-          )    
-      GROUP BY
-      aid, audiencecohort) AS view_time
-ON view_stats.aid = view_time.aid 
-AND view_stats.audiencecohort = view_time.audiencecohort
+            aid, audiencecohort)
 )
 
 /*************************************************************************************************************
