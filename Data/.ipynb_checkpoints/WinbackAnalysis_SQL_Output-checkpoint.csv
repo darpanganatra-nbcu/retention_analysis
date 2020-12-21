@@ -1,0 +1,13 @@
+audiencecohort,adopter_group,lapsed_users,winback_users,winback_rate
+targetablegroup_paidsoc,late,1528001,153193,0.10025713333957242
+targetablegroup_paiddis,late,1527651,153106,0.10022315306310145
+targetablegroup_control,early,3049875,857640,0.2812049674166974
+targetablegroup_paidsoc,early,3221270,905012,0.28094881832320795
+targetablegroup_paiddis,early,3221362,904936,0.2809172021027131
+holdoutgroup_paidsoc,early,171487,47296,0.27579933172776944
+holdoutgroup_paiddis,early,171395,47372,0.2763907931970011
+holdoutgroup_paidsoc,late,84754,8528,0.10062061967576752
+targetablegroup_control,late,1442897,144578,0.10019980636178466
+holdoutgroup_control,early,172254,45794,0.2658515912547749
+holdoutgroup_paiddis,late,85104,8615,0.1012290844143636
+holdoutgroup_control,late,85747,8341,0.09727454021715046

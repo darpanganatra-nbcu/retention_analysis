@@ -1,0 +1,8 @@
+﻿audiencecohort,lapsed_users,winback_users,winback_rate
+targetablegroup_control,7096150,1256518,0.177070383
+holdoutgroup_control,160300,21819,0.136113537
+targetablegroup_paidsoc,7256183,1278874,0.176246106
+holdoutgroup_paidsoc,159275,22305,0.14004081
+targetablegroup_paiddis,7255425,1278823,0.17625749
+holdoutgroup_braze,145625,19087,0.131069528
+holdoutgroup_paiddis,160033,22356,0.139696188

@@ -1,0 +1,13 @@
+adopter_group,audiencecohort,save_rate_denom,saves,save_rate
+early,targetablegroup_paiddis,3765080,857917,0.22786155938253636
+late,targetablegroup_paidsoc,2894974,454608,0.15703353467077769
+late,targetablegroup_paiddis,2894572,454672,0.15707745393792244
+early,holdoutgroup_control,202217,44181,0.2184831146738405
+early,holdoutgroup_paidsoc,203157,46068,0.22676058417873862
+early,targetablegroup_control,3561923,811849,0.22792435434454927
+late,holdoutgroup_paiddis,160751,25036,0.15574397670932064
+early,holdoutgroup_paiddis,203286,46213,0.22732996861564495
+late,holdoutgroup_paidsoc,160349,25100,0.1565335611696986
+late,targetablegroup_control,2734223,429572,0.1571093506272166
+late,holdoutgroup_control,160355,24293,0.1514951202020517
+early,targetablegroup_paidsoc,3765209,858062,0.2278922630855286

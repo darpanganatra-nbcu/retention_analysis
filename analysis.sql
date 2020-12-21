@@ -53,9 +53,9 @@ FROM (SELECT
              )  AS video
              INNER JOIN 
              (
-             SELECT * FROM `nbcu-sdp-sandbox-prod.hr_sandbox.all_audiencecohort_table_signup_dates` 
+             SELECT * FROM `res-nbcupea-dev-ds-sandbox-001.dg_sandbox.all_audiencecohort_table_signup_dates` 
                WHERE 
-             adopter_group like '%early%' and signup_date >= '2020-06-21' 
+             adopter_group like '%pre%' and signup_date >= '2020-06-21' 
              ) AS usertable 
              ON 
              video.adobe_tracking_id = usertable.aid 
@@ -98,9 +98,9 @@ FROM (SELECT
              )  AS video
              INNER JOIN 
              (
-             SELECT * FROM `nbcu-sdp-sandbox-prod.hr_sandbox.all_audiencecohort_table_signup_dates` 
+             SELECT * FROM `res-nbcupea-dev-ds-sandbox-001.dg_sandbox.all_audiencecohort_table_signup_dates` 
                WHERE 
-             adopter_group like '%early%' and signup_date >= '2020-06-21' -- where signup_date <  CAST('2020-04-29' AS DATE) 
+             adopter_group like '%pre%' and signup_date >= '2020-06-21' -- where signup_date <  CAST('2020-04-29' AS DATE) 
              ) AS usertable 
              ON 
              video.adobe_tracking_id = usertable.aid 
@@ -142,9 +142,9 @@ FROM (SELECT
              )  AS video
              INNER JOIN 
              (
-             SELECT * FROM `nbcu-sdp-sandbox-prod.hr_sandbox.all_audiencecohort_table_signup_dates` 
+             SELECT * FROM `res-nbcupea-dev-ds-sandbox-001.dg_sandbox.all_audiencecohort_table_signup_dates` 
               WHERE 
-             adopter_group like '%late%' and signup_date >= '2020-06-21'  -- signup_date >= CAST('2020-04-29' AS DATE) -- users who signed up on or after 4/29
+             adopter_group like '%during%' and signup_date >= '2020-06-21'  -- signup_date >= CAST('2020-04-29' AS DATE) -- users who signed up on or after 4/29
              ) AS usertable 
              ON 
              video.adobe_tracking_id = usertable.aid 
@@ -187,9 +187,9 @@ FROM (SELECT
              )  AS video
              INNER JOIN 
              (
-             SELECT * FROM `nbcu-sdp-sandbox-prod.hr_sandbox.all_audiencecohort_table_signup_dates` 
+             SELECT * FROM `res-nbcupea-dev-ds-sandbox-001.dg_sandbox.all_audiencecohort_table_signup_dates` 
               WHERE 
-             adopter_group like '%late%' and signup_date >= '2020-06-21'  -- signup_date >= CAST('2020-04-29' AS DATE) -- users who signed up on or after 4/29 to 5/12 
+             adopter_group like '%during%' and signup_date >= '2020-06-21'  -- signup_date >= CAST('2020-04-29' AS DATE) -- users who signed up on or after 4/29 to 5/12 
              ) AS usertable 
              ON 
              video.adobe_tracking_id = usertable.aid 
@@ -229,9 +229,9 @@ FROM
   count(DISTINCT aid) AS cohort_size -- early adopters before 4/29
   FROM 
              (
-             SELECT * FROM `nbcu-sdp-sandbox-prod.hr_sandbox.all_audiencecohort_table_signup_dates` 
+             SELECT * FROM `res-nbcupea-dev-ds-sandbox-001.dg_sandbox.all_audiencecohort_table_signup_dates` 
               WHERE 
-             adopter_group like '%early%' and signup_date >= '2020-06-21'  -- signup_date <  CAST('2020-04-29' AS DATE) 
+             adopter_group like '%pre%' and signup_date >= '2020-06-21'  -- signup_date <  CAST('2020-04-29' AS DATE) 
              ) 
   GROUP BY audiencecohort) 
   AS cohort
@@ -271,9 +271,9 @@ FROM
   count(DISTINCT aid) AS cohort_size -- later adopters signed up on >= 4/29
   FROM 
              (
-             SELECT * FROM `nbcu-sdp-sandbox-prod.hr_sandbox.all_audiencecohort_table_signup_dates` 
+             SELECT * FROM `res-nbcupea-dev-ds-sandbox-001.dg_sandbox.all_audiencecohort_table_signup_dates` 
               WHERE 
-             adopter_group like '%late%' and signup_date >= '2020-06-21'  -- signup_date >=  CAST('2020-04-29' AS DATE) --  4/29 and onwards sigups
+             adopter_group like '%during%' and signup_date >= '2020-06-21'  -- signup_date >=  CAST('2020-04-29' AS DATE) --  4/29 and onwards sigups
              ) 
   GROUP BY audiencecohort) 
   AS cohort
@@ -312,9 +312,9 @@ FROM
   count(DISTINCT aid) AS cohort_size -- early adopters before 4/29
   FROM 
              (
-             SELECT * FROM `nbcu-sdp-sandbox-prod.hr_sandbox.all_audiencecohort_table_signup_dates` 
+             SELECT * FROM `res-nbcupea-dev-ds-sandbox-001.dg_sandbox.all_audiencecohort_table_signup_dates` 
               WHERE 
-             adopter_group like '%early%' and signup_date >= '2020-06-21'  -- signup_date <  CAST('2020-04-29' AS DATE) 
+             adopter_group like '%pre%' and signup_date >= '2020-06-21'  -- signup_date <  CAST('2020-04-29' AS DATE) 
              ) 
   GROUP BY audiencecohort) 
   AS cohort
@@ -354,9 +354,9 @@ FROM
   count(DISTINCT aid) AS cohort_size -- later adopters signed up on >= 4/29
   FROM 
              (
-             SELECT * FROM `nbcu-sdp-sandbox-prod.hr_sandbox.all_audiencecohort_table_signup_dates` 
+             SELECT * FROM `res-nbcupea-dev-ds-sandbox-001.dg_sandbox.all_audiencecohort_table_signup_dates` 
               WHERE 
-             adopter_group like '%late%' and signup_date >= '2020-06-21'  -- signup_date >=  CAST('2020-04-29' AS DATE) --  4/29 and onwards sigups
+             adopter_group like '%during%' and signup_date >= '2020-06-21'  -- signup_date >=  CAST('2020-04-29' AS DATE) --  4/29 and onwards sigups
              ) 
   GROUP BY audiencecohort) 
   AS cohort
