@@ -1,2 +1,3 @@
 # Retention Analysis
-Retention Analysis Procedure
+
+Clone the directory and open evergreen_analysis_process.html in your browser.
