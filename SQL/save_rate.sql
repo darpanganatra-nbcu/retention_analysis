@@ -1,5 +1,5 @@
-DECLARE report_start_date DATE DEFAULT "2020-10-01";
-DECLARE report_end_date DATE DEFAULT "2020-10-30";
+DECLARE report_start_date DATE DEFAULT "2020-12-01";
+DECLARE report_end_date DATE DEFAULT "2020-12-31";
 
 WITH lapsing_users AS (
     SELECT
@@ -40,6 +40,7 @@ lapse_data AS (
 )
 SELECT
     audiencecohort,
+    tenure_classification,
     COUNT(DISTINCT tracking_id) AS save_rate_denom,
     COUNT(DISTINCT adobe_tracking_id) AS saves,
     COUNT(DISTINCT adobe_tracking_id) / COUNT(DISTINCT tracking_id) AS save_rate
@@ -48,14 +49,16 @@ FROM
         SELECT
             A.aid,
             A.audiencecohort,
+            A.tenure_classification ,
             B.tracking_id,
             B.adobe_tracking_id
         FROM
-            `res-nbcupea-dev-ds-sandbox-001.dg_sandbox.all_audiencecohort_table_signup_dates` A
+            `res-nbcupea-dev-ds-sandbox-001.weekly_retention_data.all_audiencecohort_classification` A
             INNER JOIN lapse_data B ON A.aid = B.tracking_id
         where
         -- Have to add signup date restriction
             A.signup_date >= "2020-06-21"
     )
 GROUP BY
-    audiencecohort
+    audiencecohort,
+    tenure_classification

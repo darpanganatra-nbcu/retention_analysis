@@ -3,10 +3,10 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-11-20 Fri 16:16 -->
+<!-- 2021-01-14 Thu 12:54 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>How to perform the evergreen analysis</title>
+<title>Evergreen Analysis Process</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content="206651167" />
 <style type="text/css">
@@ -243,156 +243,81 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="content">
-<h1 class="title">How to perform the evergreen analysis</h1>
+<h1 class="title">Evergreen Analysis Process</h1>
 
-<div id="outline-container-org8072760" class="outline-2">
-<h2 id="org8072760">Data Pull</h2>
-<div class="outline-text-2" id="text-org8072760">
+<div id="outline-container-orgb0f3156" class="outline-2">
+<h2 id="orgb0f3156">Data Preparation</h2>
+<div class="outline-text-2" id="text-orgb0f3156">
 <ul class="org-ul">
-<li>Start the data pull at least 24 hours ahead of time so mParticle has
-enough time to process everything.</li>
-<li>There is a 90 day audience retention issue in mParticle. Which means
-that you will need to ensure the marketing team knows that there
-will be bleed between the current targetable and holdout audiences</li>
-<li class="off"><input type='checkbox' /> Start mParticle export <a href="https://app.mparticle.com/">here</a>
-<ul class="org-ul">
-<li>The audiences that you want are in "Master Media Hold Out Groups":
-<ol class="org-ol">
-<li>Control</li>
-<li>Braze Control Group</li>
-<li>Paid Social Control Group</li>
-<li>Paid Display Control Group</li>
-</ol></li>
-<li>The "Identities" that you want are:
-<ol class="org-ol">
-<li>mParticleID (not necessary but still useful)</li>
-<li>Other ID 5 (necessary)</li>
-</ol></li>
-</ul></li>
+<li class="off"><input type='checkbox' /> Open BigQuery and run the file <a href=" SQL/audience_creation.sql">here</a>. This will get the general audience and the signup dates created. 
+Keep in mind that if you're doing a tenure analysis, there is a minimum 1 week tenure requirement on lines 82 - 98. If you want to remove the tenure requirement, you can adjust the `tenure_requirement` variable to be 0 days.</li>
+<li class="off"><input type='checkbox' /> Run <a href=" SQL/holdout_groups.sql">this</a> file to get the holdout groups. This is the end of the data preparation</li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgf0d10c7" class="outline-2">
-<h2 id="orgf0d10c7">Data Upload</h2>
-<div class="outline-text-2" id="text-orgf0d10c7">
+<div id="outline-container-org172ec64" class="outline-2">
+<h2 id="org172ec64">Analysis SQL</h2>
+<div class="outline-text-2" id="text-org172ec64">
+</div>
+<div id="outline-container-org7386108" class="outline-3">
+<h3 id="org7386108">General KPIs</h3>
+<div class="outline-text-3" id="text-org7386108">
 <ul class="org-ul">
-<li>Make sure that you have the service account key in your computer,
-and note that file path down, it'll be important for the file upload
-process.</li>
-</ul>
+<li class="off"><input type='checkbox' /> <p>
+Open <a href=" SQL/general_analysis.sql">this</a> file and adjust the `campaign_start_period` to the start of the analysis period. 
+</p>
 
+<p>
+Keep in mind that the `analysis_window` variable defaults to the end of the next month. If you need some custom window, you can write
+</p>
 
-<ul class="org-ul">
-<li class="off"><input type='checkbox' /> Download the audiences and move them to the "Data" folder</li>
-<li class="off"><input type='checkbox' /> Unzip the audiences in the Data folder</li>
-<li class="off"><input type='checkbox' /> Go to the GCP folder <a href="https://console.cloud.google.com/storage/browser/retention-analysis;tab=objects?forceOnBucketsSortingFiltering=false&amp;project=res-nbcupea-dev-ds-sandbox-001&amp;prefix=&amp;forceOnObjectsSortingFiltering=false">here</a> and move each file to archive for records</li>
-<li class="off"><input type='checkbox' /> Go to <code>Notebooks/FileUpload.ipynb</code> in JupyterLab, and replace
-the string that says <code>INSERT_CREDENTIALS_HERE</code> with the path we
-noted above</li>
-<li class="off"><input type='checkbox' /> Run the first cell of the notebook with <code>Shift+Enter</code> &amp; in the
-second cell, change the file path to point to where you unziped your
-files. Then, run the second cell</li>
-</ul>
+<div class="org-src-container">
+<pre class="src src-sql">SET analysis_window = DATE_DIFF(custom_end_date, campaign_start_period, DAY);
+</pre>
+</div>
 
-
-<ul class="org-ul">
-<li>Once the notebook has finished running, you should be able to go
-back to the GCP folder above and see the new files</li>
-</ul>
-
-
-<ul class="org-ul">
-<li class="off"><input type='checkbox' /> Delete and then create the four tables that are in our script: 
-<ol class="org-ol">
-<li>res-nbcupea-dev-ds-sandbox-001.dg_sandbox.all_media_holdout</li>
-<li>res-nbcupea-dev-ds-sandbox-001.dg_sandbox.paid_social_holdout</li>
-<li>res-nbcupea-dev-ds-sandbox-001.dg_sandbox.paid_display_holdout</li>
-<li>res-nbcupea-dev-ds-sandbox-001.dg_sandbox.paid_braze_holdout</li>
-</ol></li>
+<p>
+where the `custom_end_date` variable is set to the end of your analysis <b>plus</b> one day and put it right afer the declaration of the `analysis_window` variable.
+</p></li>
+<li class="off"><input type='checkbox' /> Save this output as `GeneralMetrics.csv` under the `data` directory.</li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orga71c6bf" class="outline-2">
-<h2 id="orga71c6bf">Holdout &amp; Targetable Table Creations</h2>
-<div class="outline-text-2" id="text-orga71c6bf">
+<div id="outline-container-org907fe5b" class="outline-3">
+<h3 id="org907fe5b">Save Rate</h3>
+<div class="outline-text-3" id="text-org907fe5b">
 <ul class="org-ul">
-<li class="off"><input type='checkbox' /> Open BigQuery and run the script found <a href="SQL/holdout_groups.sql">here</a> to get the adobe IDs
-and signup dates</li>
-<li class="off"><input type='checkbox' /> Run the script found <a href="SQL/make_holdout_groups.sql">here</a> to create the targetable audiences</li>
+<li class="off"><input type='checkbox' /> Open <a href=" SQL/save_rate.sql">this</a> file and adjust the `report_start_date` and `report_end_date` variables for the required analysis.</li>
+<li class="off"><input type='checkbox' /> Save this output as `SaveRates.csv` under the `data` directory.</li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org2b1dd97" class="outline-2">
-<h2 id="org2b1dd97">Analysis SQL</h2>
-<div class="outline-text-2" id="text-org2b1dd97">
-</div>
-<div id="outline-container-org7a95f5c" class="outline-3">
-<h3 id="org7a95f5c">General KPIs</h3>
-<div class="outline-text-3" id="text-org7a95f5c">
+<div id="outline-container-org3a594e7" class="outline-3">
+<h3 id="org3a594e7">Winback Rate</h3>
+<div class="outline-text-3" id="text-org3a594e7">
 <ul class="org-ul">
-<li class="off"><input type='checkbox' /> Open <a href="SQL/evergreen_analysis.sql">this file</a> and edit the "campaign_start_period" variable for
-the beginning of the month you want to look at, then run it
-<ul class="org-ul">
-<li>The output will include everything you need except save and
-winback rates which will be in the next step. Download that file,
-and put it in the <code>Data</code> folder as <code>general_results.csv</code></li>
-</ul></li>
-</ul>
-</div>
-</div>
-<div id="outline-container-orgb559b29" class="outline-3">
-<h3 id="orgb559b29">Save &amp; Winback Rate</h3>
-<div class="outline-text-3" id="text-orgb559b29">
-<ul class="org-ul">
-<li class="off"><input type='checkbox' /> Open <a href="SQL/save_rate.sql">this file</a> and edit the <code>report_start_date</code> and
-<code>report_end_date</code> variables for the beginning and end of the month
-we're looking at, then run it
-<ul class="org-ul">
-<li>The output will now include the data necessary for the save rate
-calculations, save it in the <code>Data</code> folder as
-<code>save_rate_results.csv</code></li>
-<li>Make sure the file only has the columns: 
-<ul class="org-ul">
-<li><code>audiencecohort</code></li>
-<li><code>save_rate_denom</code></li>
-<li><code>saves</code></li>
-<li><code>save_rate</code></li>
-</ul></li>
-</ul></li>
-<li class="off"><input type='checkbox' /> Open <a href="SQL/winback_lapse.sql">this file</a> and again edit the <code>report_start_date</code> and the
-<code>report_end_date</code> variables for the beginning of the month of interest.
-<ul class="org-ul">
-<li>Similarly save this result under the <code>Data</code> folder as
-<code>winback_rate_results.csv</code></li>
-<li>Make sure the file only has the columns:
-<ul class="org-ul">
-<li><code>audiencecohort</code></li>
-<li><code>lapsed_users</code></li>
-<li><code>winback_users</code></li>
-<li><code>winback_rate</code></li>
-</ul></li>
-</ul></li>
+<li class="off"><input type='checkbox' /> Open <a href=" SQL/winback_rate.sql">this</a> file and similarly adjust the `REPORT_START_DATE` variable. Consult me if you need to adjust the report end date.</li>
+<li class="off"><input type='checkbox' /> Save this output as `WinbackRates.csv` under the `data` directory.</li>
 </ul>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org7ac5a87" class="outline-2">
-<h2 id="org7ac5a87">Significance Testing</h2>
-<div class="outline-text-2" id="text-org7ac5a87">
-<ul class="org-ul">
-<li class="off"><input type='checkbox' /> Go to Notebooks/SignificanceTestingV2.ipynb in JupyterLab and
-run all cells. This will give you the p-values for significance testing.</li>
-</ul>
+<div id="outline-container-orgcfce32d" class="outline-2">
+<h2 id="orgcfce32d">Analysis Python</h2>
+<div class="outline-text-2" id="text-orgcfce32d">
+<p>
+Run the `Formatting.ipynb` notebook for results.
+</p>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: 206651167</p>
-<p class="date">Created: 2020-11-20 Fri 16:16</p>
+<p class="date">Created: 2021-01-14 Thu 12:54</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

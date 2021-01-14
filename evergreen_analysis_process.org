@@ -1,0 +1,33 @@
+#+TITLE: Evergreen Analysis Process 
+#+OPTIONS: toc:nil num:nil ^:nil
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="style.css"/>
+#+STARTUP: latexpreview
+
+* Data Preparation
+  * [ ] Open BigQuery and run the file [[file: SQL/audience_creation.sql][here]]. This will get the general audience and the signup dates created. 
+    Keep in mind that if you're doing a tenure analysis, there is a minimum 1 week tenure requirement on lines 82 - 98. If you want to remove the tenure requirement, you can adjust the `tenure_requirement` variable to be 0 days. 
+  * [ ] Run [[file: SQL/holdout_groups.sql][this]] file to get the holdout groups. This is the end of the data preparation
+
+* Analysis SQL
+** General KPIs
+   * [ ] Open [[file: SQL/general_analysis.sql][this]] file and adjust the `campaign_start_period` to the start of the analysis period. 
+     
+     Keep in mind that the `analysis_window` variable defaults to the end of the next month. If you need some custom window, you can write
+     
+     #+BEGIN_SRC sql
+       SET analysis_window = DATE_DIFF(custom_end_date, campaign_start_period, DAY);
+     #+END_SRC
+     
+     where the `custom_end_date` variable is set to the end of your analysis *plus* one day and put it right afer the declaration of the `analysis_window` variable.
+   * [ ] Save this output as `GeneralMetrics.csv` under the `data` directory.
+
+** Save Rate
+   * [ ] Open [[file: SQL/save_rate.sql][this]] file and adjust the `report_start_date` and `report_end_date` variables for the required analysis.
+   * [ ] Save this output as `SaveRates.csv` under the `data` directory.
+
+** Winback Rate
+   * [ ] Open [[file: SQL/winback_rate.sql][this]] file and similarly adjust the `REPORT_START_DATE` variable. Consult me if you need to adjust the report end date.
+   * [ ] Save this output as `WinbackRates.csv` under the `data` directory.
+
+* Analysis Python
+  Run the `Formatting.ipynb` notebook for results.
