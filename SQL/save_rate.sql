@@ -40,7 +40,6 @@ lapse_data AS (
 )
 SELECT
     audiencecohort,
-    tenure_classification,
     COUNT(DISTINCT tracking_id) AS save_rate_denom,
     COUNT(DISTINCT adobe_tracking_id) AS saves,
     COUNT(DISTINCT adobe_tracking_id) / COUNT(DISTINCT tracking_id) AS save_rate
@@ -49,7 +48,6 @@ FROM
         SELECT
             A.aid,
             A.audiencecohort,
-            A.tenure_classification ,
             B.tracking_id,
             B.adobe_tracking_id
         FROM
@@ -60,5 +58,4 @@ FROM
             A.signup_date >= "2020-06-21"
     )
 GROUP BY
-    audiencecohort,
-    tenure_classification
+    audiencecohort

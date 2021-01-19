@@ -4,7 +4,6 @@ with overall_stats as (
     SELECT
         aid,
         audiencecohort,
-        tenure_classification,
         distinct_titles,
         content_starts,
         content_completed,
@@ -14,7 +13,6 @@ with overall_stats as (
             SELECT
                 aid,
                 audiencecohort,
-                tenure_classification,
                 count(DISTINCT new_program) AS distinct_titles,
                 sum(num_views_started) AS content_starts,
                 sum(num_views_completed) AS content_completed,
@@ -47,14 +45,12 @@ with overall_stats as (
                 )
             GROUP BY
                 aid,
-                audiencecohort,
-                tenure_classification
+                audiencecohort
         )
 ),
 general_stats as (
     SELECT
         audiencecohort,
-        tenure_classification,
         count(DISTINCT aid) AS conversions_watched_video,
         sum(distinct_titles) / count(DISTINCT aid) AS repertoire,
         STDDEV(distinct_titles) as repertoire_stddev,
@@ -67,8 +63,7 @@ general_stats as (
     FROM
         overall_stats
     GROUP BY
-        audiencecohort,
-        tenure_classification
+        audiencecohort
 )
 SELECT
     *

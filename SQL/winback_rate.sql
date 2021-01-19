@@ -46,7 +46,6 @@ lapse_data AS (
 )
 SELECT
     audiencecohort,
-    tenure_classification,
     COUNT(DISTINCT tracking_id) AS winback_rate_denom,
     COUNT(DISTINCT adobe_tracking_id) AS winbacks,
     COUNT(DISTINCT adobe_tracking_id) / COUNT(DISTINCT tracking_id) AS winback_rate
@@ -55,7 +54,6 @@ FROM
         SELECT
             A.aid,
             A.audiencecohort,
-            A.tenure_classification,
             B.tracking_id,
             B.adobe_tracking_id
         FROM
@@ -66,5 +64,4 @@ FROM
             AND A.signup_date <= DATE_SUB(REPORT_START_DATE, INTERVAL 1 DAY)
     )
 GROUP BY
-    audiencecohort,
-    tenure_classification
+    audiencecohort
